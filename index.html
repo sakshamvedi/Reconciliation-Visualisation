@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconciliation Animation</title>
+    <style>
+        .dashboard {
+            display: flex;
+            position: fixed;
+            top: 0px;
+            font-size: 23px;
+            justify-content: space-evenly;
+            width: 100%;
+            left: 0;
+
+            background-color: #000;
+            color: white;
+        }
+
+        .main-container {
+            margin-top: 120px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            background-color: rgba(255, 0, 0, 0.102);
+            border-radius: 12px;
+
+            height: 100px;
+            margin: 10px;
+            border: 2px solid #000;
+            transition: transform 0.5s ease-in-out;
+
+        }
+
+        .fade-out {
+            transform: scale(0);
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+
+
+    </div>
+    <div class="dashboard">
+        <p>Updated : <span class="updated"></span></p>
+        <p>Add : <span class="add"></span></p>
+        <p>Delete : <span class="delete"></span></p>
+    </div>
+
+    <script>
+        var parentContainer = document.querySelector(".main-container");
+        var oldData = [];
+        let add = 0;
+        let remove = 0;
+        let update = 0;
+        const adds = document.querySelector(".add");
+        const removes = document.querySelector(".delete");
+        const updates = document.querySelector(".updated");
+        function startevent(newData) {
+
+            var currentChildren = Array.from(parentContainer.children);
+
+            newData.forEach((item) => {
+                var existingItem = currentChildren.find(child => child.dataset.id === item.id);
+
+                if (existingItem) {
+                    update++;
+                    existingItem.children[0].innerHTML = item.name;
+                } else {
+                    add++;
+                    var newNode = document.createElement("div");
+                    newNode.className = "node";
+                    newNode.dataset.id = item.id;
+                    newNode.innerHTML = `<p>${item.name}</p>`;
+                    parentContainer.appendChild(newNode);
+                    void newNode.offsetWidth;
+                    newNode.classList.add("fade-in");
+                }
+            });
+
+            currentChildren.forEach((child) => {
+                remove++
+                var isExisting = newData.some(item => item.id === child.dataset.id);
+                if (!isExisting) {
+                    child.classList.add("fade-out");
+                    child.addEventListener("transitionend", function () {
+                        parentContainer.removeChild(child);
+                    });
+                }
+            });
+            adds.innerHTML = add;
+            removes.innerHTML = remove;
+            updates.innerHTML = update;
+        }
+
+        setInterval(() => {
+            let mydata = [];
+            const rdm = Math.floor(Math.random() * 10);
+            for (i = 0; i < rdm; i++) {
+                mydata.push({
+                    "id": i,
+                    "name": "Node " + i,
+                });
+            }
+            startevent(mydata);
+        }, 1000);
+    </script>
+</body>
+
+</html>
